@@ -7,6 +7,8 @@
 - Formated response errors for the client using @ControllerAdvice and Java Exceptions
 
 ## Tools
+
+- Java 17
 - Spring Starters 
 - Maven
 - Mockito

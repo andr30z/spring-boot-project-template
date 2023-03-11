@@ -36,7 +36,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest {
+public class UserServiceImplTests {
 
   public static final String WANNABE_ACCESS_TOKEN = "WANNABE_ACCESS_TOKEN";
 
