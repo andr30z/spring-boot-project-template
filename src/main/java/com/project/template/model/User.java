@@ -23,12 +23,8 @@ import lombok.experimental.SuperBuilder;
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "users_seq")
-  @SequenceGenerator(
-    name = "users_seq",
-    sequenceName = "users_seq",
-    allocationSize = 1
-  )
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+  @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
   @Column(name = "id", updatable = false)
   private Long id;
 
