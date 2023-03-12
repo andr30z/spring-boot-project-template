@@ -3,6 +3,7 @@
 ## Features
 
 - Complete Users module (model, controller, service, repository and tests)
+- Api Documentation with springdoc-openapi
 - Complete authentication flow (including refresh tokens!) using Spring Security + cookies
 - Formated response errors for the client using @ControllerAdvice and Java Exceptions
 

@@ -6,14 +6,37 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.Optional;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.BDDMockito;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.template.dto.CreateUserDTO;
 import com.project.template.dto.LoginRequest;
 import com.project.template.dto.LoginResponse;
 import com.project.template.dto.Token;
-import com.project.template.dto.UserCreatedEvent;
 import com.project.template.exception.BadRequestException;
 import com.project.template.exception.EntityExistsException;
 import com.project.template.exception.ResourceNotFoundException;
@@ -22,18 +45,6 @@ import com.project.template.repository.UserRepository;
 import com.project.template.service.impl.UserServiceImpl;
 import com.project.template.utils.CookieUtil;
 import com.project.template.utils.SecurityCipher;
-import java.io.IOException;
-import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTests {
