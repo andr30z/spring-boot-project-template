@@ -1,5 +1,17 @@
 package com.project.template.service.impl;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.project.template.dto.CreateUserDTO;
 import com.project.template.dto.LoginRequest;
 import com.project.template.dto.LoginResponse;
@@ -13,18 +25,8 @@ import com.project.template.service.TokenProvider;
 import com.project.template.service.UserService;
 import com.project.template.utils.CookieUtil;
 import com.project.template.utils.SecurityCipher;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
