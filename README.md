@@ -2,8 +2,8 @@
 
 ## Features
 
-- Complete Users module (model, controller, service, repository and tests)
-- Api Documentation with springdoc-openapi
+- Complete Users module (model, controller, service, repository, migration and tests)
+- Api Documentation with springdoc-openapi (available at http:localhost:8080/swagger-ui.html)
 - Complete authentication flow (including refresh tokens!) using Spring Security + cookies
 - Formated response errors for the client using @ControllerAdvice and Java Exceptions
 
@@ -12,7 +12,7 @@
 - Java 17
 - Spring Starters 
 - Maven
-- Mockito
+- JUnit/Mockito
 - Postgres and H2
 - Flyway
 
