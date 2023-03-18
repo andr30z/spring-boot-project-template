@@ -6,15 +6,27 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.project.template.dto.CreateUserDTO;
+import com.project.template.dto.CustomUserDetails;
+import com.project.template.dto.LoginRequest;
+import com.project.template.dto.LoginResponse;
+import com.project.template.dto.Token;
+import com.project.template.exception.BadRequestException;
+import com.project.template.exception.EntityExistsException;
+import com.project.template.exception.ResourceNotFoundException;
+import com.project.template.model.User;
+import com.project.template.repository.UserRepository;
+import com.project.template.service.impl.UserServiceImpl;
+import com.project.template.utils.CookieUtil;
+import com.project.template.utils.SecurityCipher;
 import java.io.IOException;
 import java.util.Optional;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,21 +42,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.project.template.dto.CreateUserDTO;
-import com.project.template.dto.LoginRequest;
-import com.project.template.dto.LoginResponse;
-import com.project.template.dto.Token;
-import com.project.template.exception.BadRequestException;
-import com.project.template.exception.EntityExistsException;
-import com.project.template.exception.ResourceNotFoundException;
-import com.project.template.model.User;
-import com.project.template.repository.UserRepository;
-import com.project.template.service.impl.UserServiceImpl;
-import com.project.template.utils.CookieUtil;
-import com.project.template.utils.SecurityCipher;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTests {
@@ -74,14 +75,33 @@ public class UserServiceImplTests {
   @Mock
   private PasswordEncoder passwordEncoder;
 
+  @Mock
+  private SecurityContext securityContext;
+
+  @Mock
+  private Authentication auth;
+
+  private MockedStatic<SecurityCipher> securityCipherStaticMocked;
+
   private AutoCloseable autoCloseable;
 
   private UserServiceImpl underTest;
-  private MockedStatic<SecurityCipher> securityCipherStaticMocked;
+
+  private String userMail = "testemail@gmail.com";
+  private String password = "123456";
+  private String testName = "Test";
+  private Long userId = 1L;
+  private User currentUser = User
+    .builder()
+    .id(userId)
+    .name(testName)
+    .email(userMail)
+    .password(password)
+    .build();
 
   @BeforeEach
   void setUp() throws IOException {
-    securityCipherStaticMocked = mockStatic(SecurityCipher.class);
+    securityCipherStaticMocked = Mockito.mockStatic(SecurityCipher.class);
     autoCloseable = MockitoAnnotations.openMocks(this);
 
     underTest =
@@ -95,6 +115,7 @@ public class UserServiceImplTests {
 
   @AfterEach
   void tearDown() throws Exception {
+    SecurityContextHolder.clearContext();
     securityCipherStaticMocked.close();
     autoCloseable.close();
   }
@@ -250,8 +271,7 @@ public class UserServiceImplTests {
   void itShouldRefreshToken() {
     String generatedToken = "NEW_TOKEN_TEST";
     String emailFromToken = "testmail@yay.com";
-    when(SecurityCipher.decrypt(anyString()))
-      .thenReturn(emailFromToken);
+    when(SecurityCipher.decrypt(anyString())).thenReturn(emailFromToken);
     when(tokenProvider.validateToken(anyString())).thenReturn(true);
     var tokenMock = new Token(
       Token.TokenType.ACCESS,
@@ -345,26 +365,17 @@ public class UserServiceImplTests {
 
   @Test
   @DisplayName("It should get the current logged user.")
-  void itShouldGetCurrentLoggedUser() {
-    // given
-    String userMail = "testemail@gmail.com";
-    String password = "123456";
-    String testName = "Test";
-    Long userId = 1L;
-    User currentUser = User
-      .builder()
-      .id(userId)
-      .name(testName)
-      .email(userMail)
-      .password(password)
-      .build();
+  void itShouldGetTheCurrentLoggedUser() {
+    mockAuthentication();
 
-    when(userRepository.findUserByEmail(anyString()))
-      .thenReturn(Optional.of(currentUser));
-    when(SecurityCipher.decrypt(anyString())).thenReturn("");
-    when(tokenProvider.getUsernameFromToken(anyString())).thenReturn("test@test.gmail");
-    User loggedUser = underTest.me(WANNABE_ACCESS_TOKEN);
+    User loggedUser = underTest.me();
 
-    assertThat(loggedUser.getId()).isEqualTo(userId);
+    assertThat(loggedUser.getId()).isEqualTo(currentUser.getId());
+  }
+
+  private void mockAuthentication() {
+    when(securityContext.getAuthentication()).thenReturn(auth);
+    when(auth.getPrincipal()).thenReturn(new CustomUserDetails(currentUser));
+    SecurityContextHolder.setContext(securityContext);
   }
 }
